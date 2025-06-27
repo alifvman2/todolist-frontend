@@ -93,9 +93,16 @@
                                 </ul>
                             </div>
                         </div>
-                        <div id="card1-body" class="mb-2">
-
-                        </div>
+                        @foreach($list['cards'] as $card)
+                            <div class="card mb-2 custom-card" id="{{ $card['id'] }}" style="background-color: {{ $card['color'] ?? 'transparent' }};">
+                                <div class="card-body d-flex gap-2 align-items-center">
+                                    <input type="checkbox" class="form-check-input checklist-card" onclick="event.stopPropagation()" onchange="handleChecklist(this, '{{ $card['id'] }}')">
+                                    <div class="flex-grow-1 btn p-0 text-start" data-bs-toggle="modal" data-bs-target="#cardModal" onclick="showCardDetail('{{ $card['name'] }}', '{{ $card['id'] }}')">
+                                        <span>{{ $card['name'] }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
                         <div class="input-group d-none" id="input-group-1">
                             <input type="text" id="input-1" class="form-control" data-idCard="card1" data-target="card1-body" onkeyup="if(event.key === 'Enter') tambahCard(this)" placeholder="Tambah card...">
                             <button class="btn btn-outline-secondary" type="button" onclick="hideInput('input-1')">Batal</button>
@@ -123,15 +130,33 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="cardModalTitle">Card Detail</h5>
+                    <h5 class="modal-title" id="cardModalTitle">testing</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p id="cardModalContent">Loading...</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="saveCardChanges()">Save changes</button>
+                    <div class="d-flex flex-row gap-2 align-items-center mb-5">
+                        <input type="checkbox" class="form-check-input checklist-card" onclick="event.stopPropagation()" onchange="handleChecklist(this, 'card1')">
+                        <h3>test</h3>
+                    </div>
+                    <div class="d-flex flex-column gap-3">
+                        <div class="d-flex flex-row">
+                            <svg width="24" height="24" role="presentation" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4 5C3.44772 5 3 5.44772 3 6C3 6.55228 3.44772 7 4 7H20C20.5523 7 21 6.55228 21 6C21 5.44772 20.5523 5 20 5H4ZM4 9C3.44772 9 3 9.44772 3 10C3 10.5523 3.44772 11 4 11H20C20.5523 11 21 10.5523 21 10C21 9.44772 20.5523 9 20 9H4ZM3 14C3 13.4477 3.44772 13 4 13H20C20.5523 13 21 13.4477 21 14C21 14.5523 20.5523 15 20 15H4C3.44772 15 3 14.5523 3 14ZM4 17C3.44772 17 3 17.4477 3 18C3 18.5523 3.44772 19 4 19H14C14.5523 19 15 18.5523 15 18C15 17.4477 14.5523 17 14 17H4Z" fill="currentColor"></path></svg>
+                            <div class="d-flex flex-column">
+                                <label for="description" class="form-label"><b>Deskripsi</b></label>
+                                <textarea name="description" id="" cols="40" rows="2" class="form-control" placeholder="Add a More detailed description"></textarea>
+                            </div>
+                        </div>
+                        <div id="containerItem">
+
+                        </div>
+                        <div class="input-group d-none" id="item-input-group">
+                            <input type="text" class="form-control" placeholder="Add an item..." id="newItemInput">
+                            <button class="btn btn-outline-secondary" type="button" onclick="hideInput('newItemInput')">Batal</button>
+                        </div>
+                        <button class="btn btn-secondary" style="width: 8rem" onclick="toggleInput('item-input-group')">
+                            + Add Item
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -259,7 +284,7 @@
         }
 
         function showCardDetail(value, idCard) {
-            document.getElementById('cardModalTitle').textContent = value;
+            // document.getElementById('cardModalTitle').textContent = value;
             document.getElementById('cardModalContent').textContent = value;
         }
 
@@ -361,6 +386,48 @@
                 }
             });
         }
+
+        function addNewItem() {
+            const input = document.getElementById('newItemInput');
+            const itemText = input.value.trim();
+            
+            if (itemText) {
+                // Membuat elemen item baru
+                const newItem = document.createElement('div');
+                newItem.className = 'form-check d-flex align-items-center mb-2';
+                
+                // Membuat checkbox
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'form-check-input me-2';
+                checkbox.onchange = function() {
+                    label.style.textDecoration = this.checked ? 'line-through' : 'none';
+                    // Anda bisa menambahkan logika penyimpanan status checkbox di sini
+                };
+                
+                // Membuat label
+                const label = document.createElement('label');
+                label.className = 'form-check-label';
+                label.textContent = itemText;
+                
+                // Menambahkan checkbox dan label ke dalam item
+                newItem.appendChild(checkbox);
+                newItem.appendChild(label);
+                
+                // Menambahkan item ke container
+                document.getElementById('containerItem').appendChild(newItem);
+                
+                // Mengosongkan input dan menyembunyikannya
+                hideInput();
+            }
+        }
+
+        // Menambahkan event listener untuk tombol Enter
+        document.getElementById('newItemInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addNewItem();
+            }
+        });
     </script>
 </body>
 </html>
