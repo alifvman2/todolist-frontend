@@ -34,5 +34,7 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-
+    'adonis' => [
+        'base_url' => env('ADONIS_API_URL', 'http://localhost:3333'),
+    ],
 ];

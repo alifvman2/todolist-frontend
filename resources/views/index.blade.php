@@ -19,6 +19,7 @@
             <div class="row align-items-center">
                 <div class="col">
                     <h3 class="mb-0">Todo List</h3>
+                    <a></a>
                 </div>
                 <div class="col-auto">
                     <div class="dropdown">
@@ -33,7 +34,7 @@
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            @if(Auth::check())
+                            @if(session('auth_token'))
                                 <li>
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
@@ -52,18 +53,18 @@
             <h1>Board</h1>
         </div>
         <div id="container" class="row d-flex justify-content-start gap-3 flex-row flex-nowrap">
-            {{-- contoh card nya  --}}
-            <div class="card p-0 btn" id="card1" style="width: 20rem;">
-                <div class="card-img-top" id="cardGradient1" style="height: 150px;">
+            @foreach($data as $board)
+                <a href="{{ route('home.show', encrypt($board['id'])) }}" class="text-decoration-none">
+                    <div class="card p-0 btn" id="{{ $board['id'] }}" style="width: 20rem;">
+                        <div class="card-img-top" id="cardGradient1" style="height: 150px;">
 
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title">Card title</h5>
-                </div>
-            </div>
-            {{-- @foreach($boards as $board)
-
-            @endforeach --}}
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ $board['name'] }}</h5>
+                        </div>
+                    </div>
+                </a>
+            @endforeach
         </div>
     </div>
 
