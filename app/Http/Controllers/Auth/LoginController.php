@@ -73,7 +73,7 @@ class LoginController extends Controller
     public function logout()
     {
 
-        Http::post(env('APP_URL_API') . '/auth/logout')
+        Http::post(env('APP_URL_API') . '/auth/logout');
 
     }
 

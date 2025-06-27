@@ -3,11 +3,11 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Session;
 
 class AdonisApi
 {
-    
-    protected static function token()
+    protected static function token(): string
     {
         $token = session('auth_token');
 
@@ -22,59 +22,43 @@ class AdonisApi
         throw new \Exception('Missing or invalid auth token in session.');
     }
 
-    protected static function csrfToken()
+    protected static function baseUrl(): string
     {
-        // Ambil dan decode token dari cookie Laravel
-        $token = request()->cookie('XSRF-TOKEN');
-
-        if (!$token) {
-            throw new \Exception('Missing XSRF-TOKEN cookie');
-        }
-
-        return urldecode($token);
+        return config('services.adonis.base_url', env('APP_URL_API', 'http://127.0.0.1:3333'));
     }
 
-    protected static function withDefaultHeaders()
+    protected static function withDefaults()
     {
-        $baseHost = parse_url(self::baseUrl(), PHP_URL_HOST);
+        $csrfCookie = urldecode(request()->cookie('XSRF-TOKEN'));
 
         return Http::withToken(self::token())
             ->withHeaders([
-                'X-XSRF-TOKEN' => self::csrfToken(),
+                'X-XSRF-TOKEN' => $csrfCookie,
+                'Accept'       => 'application/json',
             ])
             ->withCookies([
-                'XSRF-TOKEN' => self::csrfToken()
-            ], $baseHost)
-            ->acceptJson();
+                'XSRF-TOKEN' => $csrfCookie,
+            ], parse_url(self::baseUrl(), PHP_URL_HOST));
     }
 
-    protected static function baseUrl()
+    public static function get(string $endpoint, array $query = [])
     {
-        return config('services.adonis.base_url', env('APP_URL_API'));
+        return self::withDefaults()->get(self::baseUrl() . $endpoint, $query);
     }
 
-    public static function get($endpoint, array $params = [])
+    public static function post(string $endpoint, array $data = [])
     {
-        return self::withDefaultHeaders()
-            ->get(self::baseUrl() . $endpoint, $params);
+        return self::withDefaults()->post(self::baseUrl() . $endpoint, $data);
     }
 
-    public static function post($endpoint, array $data = [])
+    public static function put(string $endpoint, array $data = [])
     {
-        return self::withDefaultHeaders()
-            ->post(self::baseUrl() . $endpoint, $data);
+        return self::withDefaults()->put(self::baseUrl() . $endpoint, $data);
     }
 
-    public static function put($endpoint, array $data = [])
+    public static function delete(string $endpoint, array $data = [])
     {
-        return self::withDefaultHeaders()
-            ->put(self::baseUrl() . $endpoint, $data);
-    }
-
-    public static function delete($endpoint)
-    {
-        return self::withDefaultHeaders()
-            ->delete(self::baseUrl() . $endpoint);
+        return self::withDefaults()->delete(self::baseUrl() . $endpoint, $data);
     }
 
 }
