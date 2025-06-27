@@ -99,11 +99,9 @@ class HomeController extends Controller
         ]);
 
         $response = AdonisApi::post('/trans/storeList', [
-            'id' => $request->email,
+            'id' => $request->id,
             'name' => $request->name
         ]);
-
-        return $response;
 
         if ($response->successful()) {
             return response()->json($response->json()['data']);
